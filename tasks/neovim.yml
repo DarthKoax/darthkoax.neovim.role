@@ -1,0 +1,79 @@
+---
+# # tasks file for neovim_install
+# - name: Install and config neovim
+#   tag: neovim
+- name: Create ~/.config/nvim
+  ansible.builtin.file:
+    path: "~/.config/nvim"
+    state: directory
+    mode: '0755'
+    owner: "{{ansible_user_id}}"
+
+- name: Create ~/.config/nvim/lua
+  ansible.builtin.file:
+    path: "~/.config/nvim/lua/"
+    state: directory
+    mode: '0755'
+    owner: "{{ansible_user_id}}"
+
+- name: Create ~/.config/nvim/after/plugin
+  ansible.builtin.file:
+    path: "~/.config/nvim/after/plugin/"
+    state: directory
+    mode: '0755'
+    owner: "{{ansible_user_id}}"
+
+- name: "Create ~/.config/nvim/lua/{{nvim_custom_project}}"
+  ansible.builtin.file:
+    path: "~/.config/nvim/lua/{{nvim_custom_project}}"
+    state: directory
+    mode: '0755'
+    owner: "{{ansible_user_id}}"
+
+- name: Download Neovim appimage from Artifactory
+  ansible.builtin.get_url:
+    url: "{{neovim_appimage_url}}{{neovim_binary_name}}"
+    dest: "/tmp"
+    mode: 0755
+    owner: root
+    group: root
+  become: true
+
+- name: Move and rename Neovim appimage to /usr/bin/nvim
+  ansible.builtin.copy:
+    src: "/tmp/{{ neovim_binary_name }}"
+    dest: "/usr/bin/nvim"
+    remote_src: true
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+
+- name: Set up init.lua
+  ansible.builtin.template:
+    src: "init.lua.j2"
+    dest: "~/.config/nvim/init.lua"
+
+- name: Find templates in a specific directory
+  find:
+    paths: "{{role_path}}/templates/lua/{{nvim_custom_project}}/"
+    patterns: "*.j2"
+  register: templates_to_process
+
+- name: Process each template
+  template:
+    src: "{{ item.path }}"
+    dest: "~/.config/nvim/lua/{{nvim_custom_project}}/{{ item.path | basename | regex_replace('.j2','')}}"
+  loop: "{{ templates_to_process.files }}"
+
+- name: Find templates in a specific directory
+  find:
+    paths: "{{role_path}}/templates/after/"
+    patterns: "*.j2"
+  register: templates_to_process
+
+- name: Process each template
+  template:
+    src: "{{ item.path }}"
+    dest: "~/.config/nvim/after/plugin/{{ item.path | basename | regex_replace('.j2','')}}"
+  loop: "{{ templates_to_process.files }}"
