@@ -91,5 +91,5 @@ nvim_lazy_plugins_install: |
 #LSP Server role dependencies
 golang_lsp_installer: golang.org/x/tools/gopls@latest
 node_version: v20.11.1
-
+nodejs_dist_source: https://nodejs.org/dist/{{node_version}}/node-{{node_version}}-linux-x64.tar.xz
 

@@ -24,13 +24,13 @@
 
 - name: Download node tarball
   ansible.builtin.get_url:
-    url: "https://nodejs.org/dist/v{{node_version}}/node-v{{node_version}-linux-x64.tar.xz"
-    dest: /tmp/node-v{{node_version}}-linux-x64.tar.xz
+    url:  "{{nodejs_dist_source}}"
+    dest: /tmp/node-{{node_version}}-linux-x64.tar.xz
     mode: '0755'
 
 - name: Extract node tarball to /usr/local/bin
   ansible.builtin.unarchive:
-    src: "/tmp/node-v{{node_version}}-linux-x64.tar.xz"
+    src: "/tmp/node-{{node_version}}-linux-x64.tar.xz"
     dest: "/opt"
     owner: "root"
     group: "root"
@@ -39,28 +39,28 @@
 
 - name: Create a symlink to the target directory
   ansible.builtin.file:
-    src: /opt/node-v{{node_version}}-linux-x64/bin/node
+    src: /opt/node-{{node_version}}-linux-x64/bin/node
     dest: /usr/local/bin/node
     state: link
     force: yes
 
 - name: Create a symlink to the target directory
   ansible.builtin.file:
-    src: /opt/node-v{{node_version}}-linux-x64/bin/npm
+    src: /opt/node-{{node_version}}-linux-x64/bin/npm
     dest: /usr/local/bin/npm
     state: link
     force: yes
 
 - name: Create a symlink to the target directory
   ansible.builtin.file:
-    src: /opt/node-v{{node_version}}-linux-x64/bin/corepack
+    src: /opt/node-{{node_version}}-linux-x64/bin/corepack
     dest: /usr/local/bin/corepack
     state: link
     force: yes
    
 - name: Create a symlink to the target directory
   ansible.builtin.file:
-    src: /opt/nnpode-v{{node_version}}-linux-x64/bin/npx
+    src: /opt/nnpode-{{node_version}}-linux-x64/bin/npx
     dest: /usr/local/bin/npx
     state: link
     force: yes
